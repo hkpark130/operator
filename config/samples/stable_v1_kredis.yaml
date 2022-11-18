@@ -1,0 +1,12 @@
+apiVersion: stable.example.com/v1
+kind: KRedis
+metadata:
+  labels:
+    app.kubernetes.io/name: kredis
+    app.kubernetes.io/instance: kredis-sample
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: operator
+  name: kredis-sample
+spec:
+  # TODO(user): Add fields here
