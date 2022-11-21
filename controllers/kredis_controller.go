@@ -23,6 +23,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -39,6 +40,7 @@ type KRedisReconciler struct {
 //+kubebuilder:rbac:groups=stable.example.com,resources=kredis,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=stable.example.com,resources=kredis/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=stable.example.com,resources=kredis/finalizers,verbs=update
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -66,6 +68,14 @@ func (r *KRedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return ctrl.Result{}, err
 	} // Reconcile 함수 구현
 
+	deployment := &appsv1.Deployment{}
+	err = r.Client.Get(context.TODO(), types.NamespacedName{Name: reqKRedis.Name, Namespace: reqKRedis.Namespace}, deployment)
+	if err != nil && kerrors.IsNotFound(err) {
+		log.Log.Info("Creating a new Deployment.", reqKRedis.Name, reqKRedis.Namespace)
+	} else if err != nil {
+		log.Log.Info("Failed to get Deployment.")
+	}
+
 	return ctrl.Result{}, nil
 }
 
@@ -73,6 +83,5 @@ func (r *KRedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 func (r *KRedisReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&stablev1.KRedis{}).
-		Owns(&appsv1.Deployment{}).
 		Complete(r)
 }
