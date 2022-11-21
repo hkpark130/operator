@@ -19,6 +19,9 @@ package controllers
 import (
 	"context"
 
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
+
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -48,8 +51,20 @@ type KRedisReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.0/pkg/reconcile
 func (r *KRedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
+	log.Log.Info("HK TEST HK TEST HK TEST HK TEST HK TEST")
 
 	// TODO(user): your logic here
+	reqKRedis := &stablev1.KRedis{}
+	err := r.Get(ctx, req.NamespacedName, reqKRedis)
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			log.Log.Info("KRedis resource not found.")
+			return ctrl.Result{}, nil
+		}
+		// custom resource를 가져오지 못 함
+		log.Log.Error(err, "Failed to get KRedis")
+		return ctrl.Result{}, err
+	} // Reconcile 함수 구현
 
 	return ctrl.Result{}, nil
 }
@@ -58,5 +73,6 @@ func (r *KRedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 func (r *KRedisReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&stablev1.KRedis{}).
+		Owns(&appsv1.Deployment{}).
 		Complete(r)
 }

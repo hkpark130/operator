@@ -19,15 +19,15 @@ make manifests
 
 # build, push operator docker image
 ```
-docker buildx build --platform linux/amd64 -t k8s-operator .
-docker tag k8s-operator asia-northeast3-docker.pkg.dev/k8s-project-365610/gar/k8s-operator
-docker push asia-northeast3-docker.pkg.dev/k8s-project-365610/gar/k8s-operator
-# # make docker-build docker-push IMG=asia-northeast3-docker.pkg.dev/k8s-project-365610/gar/k8s-operator:latest # (M1 에서는 안 됨)
+docker buildx build --platform linux/amd64 -t park-operator .
+docker tag park-operator public.ecr.aws/x8r0y3u4/park-operator:latest
+docker push public.ecr.aws/x8r0y3u4/park-operator:latest
+# # make docker-build docker-push IMG=public.ecr.aws/x8r0y3u4/park-operator:latest # (M1 에서는 안 됨)
 ```
 
 # Deploy the controller to the cluster
 ```
-make deploy IMG=asia-northeast3-docker.pkg.dev/k8s-project-365610/gar/k8s-operator:latest
+make deploy IMG=public.ecr.aws/x8r0y3u4/park-operator:latest
 ```
 
 # Define & Install CRD on K8S Cluster

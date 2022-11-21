@@ -29,7 +29,8 @@ type KRedisSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of KRedis. Edit kredis_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Image    string `json:"image"`
+	Replicas int32  `json:"replicas"`
 }
 
 // KRedisStatus defines the observed state of KRedis
