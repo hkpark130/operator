@@ -10,5 +10,5 @@ metadata:
   name: kredis-sample
 spec:
   # TODO(user): Add fields here
-  image: redis:7.0.5
-  replicas: 1
+  image: public.ecr.aws/x8r0y3u4/redis-cluster:latest
+  replicas: 3
