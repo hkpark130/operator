@@ -82,12 +82,12 @@ func (r *KRedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			return ctrl.Result{}, err
 		}
 
-		// Define a new loadbalancer
-		svc := r.loadBalancerForKRedis(reqKRedis)
-		log.Log.Info("Creating a new LoadBalancer.", reqKRedis.Name, reqKRedis.Namespace)
+		// Define a new clusterIP
+		svc := r.clusterIPForKRedis(reqKRedis)
+		log.Log.Info("Creating a new ClusterIP.", reqKRedis.Name, reqKRedis.Namespace)
 		err = r.Client.Create(ctx, svc)
 		if err != nil {
-			log.Log.Error(err, "Failed to create new LoadBalancer", "LoadBalancer.Namespace", svc.Namespace, "LoadBalancer.Name", svc.Name)
+			log.Log.Error(err, "Failed to create new ClusterIP", "ClusterIP.Namespace", svc.Namespace, "ClusterIP.Name", svc.Name)
 			return ctrl.Result{}, err
 		}
 
@@ -129,7 +129,7 @@ func (r *KRedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	return ctrl.Result{}, nil
 }
 
-func (r *KRedisReconciler) loadBalancerForKRedis(m *stablev1.KRedis) *corev1.Service {
+func (r *KRedisReconciler) clusterIPForKRedis(m *stablev1.KRedis) *corev1.Service {
 	ls := labelsForKRedis(m.Name)
 
 	svc := &corev1.Service{
@@ -139,7 +139,7 @@ func (r *KRedisReconciler) loadBalancerForKRedis(m *stablev1.KRedis) *corev1.Ser
 			Labels:    ls,
 		},
 		Spec: corev1.ServiceSpec{
-			Type:     corev1.ServiceTypeLoadBalancer,
+			Type:     corev1.ServiceTypeClusterIP,
 			Selector: ls,
 			Ports: []corev1.ServicePort{
 				{
@@ -174,6 +174,22 @@ func (r *KRedisReconciler) deploymentForKRedis(m *stablev1.KRedis) *appsv1.Deplo
 					Labels: ls,
 				},
 				Spec: corev1.PodSpec{
+					Affinity: &corev1.Affinity{
+						PodAntiAffinity: &corev1.PodAntiAffinity{
+							RequiredDuringSchedulingIgnoredDuringExecution: []corev1.PodAffinityTerm{{
+								LabelSelector: &metav1.LabelSelector{
+									MatchExpressions: []metav1.LabelSelectorRequirement{
+										{
+											Key:      "app",
+											Operator: metav1.LabelSelectorOpIn,
+											Values:   []string{"kredis"},
+										},
+									},
+								},
+								TopologyKey: "kubernetes.io/hostname",
+							}},
+						},
+					},
 					Containers: []corev1.Container{{
 						Image: "public.ecr.aws/x8r0y3u4/redis-cluster:latest",
 						Name:  "kredis",
