@@ -10,5 +10,12 @@ metadata:
   name: kredis-sample
 spec:
   # TODO(user): Add fields here
+  replicas: 1
+  masters: 2
   image: public.ecr.aws/x8r0y3u4/redis-cluster:latest
-  replicas: 3
+  memory: 1gb
+  basePort: 10000
+  resource:
+    requests:
+      cpu: "2"
+      memory: "2000Mi"

@@ -35,16 +35,34 @@ spec:
           spec:
             description: KRedisSpec defines the desired state of KRedis
             properties:
+              basePort:
+                format: int32
+                type: integer
               image:
                 description: Foo is an example field of KRedis. Edit kredis_types.go
                   to remove/update
                 type: string
+              masters:
+                format: int32
+                type: integer
+              memory:
+                type: string
               replicas:
                 format: int32
                 type: integer
+              resource:
+                additionalProperties:
+                  additionalProperties:
+                    type: string
+                  type: object
+                type: object
             required:
+            - basePort
             - image
+            - masters
+            - memory
             - replicas
+            - resource
             type: object
           status:
             description: KRedisStatus defines the observed state of KRedis

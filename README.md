@@ -48,5 +48,25 @@ make uninstall
 make undeploy
 ```
 
+------------------------------------------------
 
+# Metrics-server
 
+```
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+# Prometheus
+
+```
+kubectl apply -f ./prometheus/prometheus-config.yaml
+kubectl apply -f ./prometheus/prometheus-deployment.yaml
+kubectl apply -f prometheus/grafana.yaml
+```
+
+------------------------------------------------
+
+# 에러 사항
+
+인스턴스 타입마다 pod에 할당할 IP 개수 제한이 있음
+[AWS EKS "0/3 nodes are available: 3 Too many pods" Error](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#AvailableIpPerENI)
